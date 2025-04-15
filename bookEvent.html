@@ -94,12 +94,86 @@
         font-size: 0.9rem;
       }
     }
+
+
+    /* FullCalendar Styling Enhancements */
+.fc .fc-toolbar-title {
+  font-size: 1.6rem;
+  color: #007bff;
+}
+
+.fc .fc-button {
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  transition: background 0.3s ease;
+}
+
+.fc .fc-button:hover {
+  background-color: #0056b3;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #e6f0ff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.fc-day-today {
+  background-color: #ffeeba !important;
+  font-weight: bold;
+  border: 1px solid #ffc107;
+}
+
+.fc-event {
+  background-color: #17a2b8 !important;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  padding: 2px 5px;
+}
+
+/* Smooth modal animation */
+.modal-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  #calendar {
+    width: 100%;
+    height: 400px; /* Adjust height for smaller screens */
+  }
+}
+
+@media (min-width: 769px) {
+  #calendar {
+    width: 80%;
+    height: 600px; /* Height for larger screens */
+  }
+}
+
+
   </style>
 </head>
 <body>
 
+
   <h2>Event Booking Calendar</h2>
-  <div id="calendar"></div>
+  <button onclick="window.location.href='event_list.html'" 
+  style="align-items: center; 
+         justify-content: center; 
+         padding: 5px 20px; /* Reduced padding to make it small around the text */
+         font-size: 14px; 
+         border-radius: 5px; 
+         margin: 0px auto; /* Center the button horizontally */
+         display: block; width: 20%;">Go to Event List</button>
+<div id="calendar"></div>
 
   <!-- Booking Modal -->
   <div id="bookingModal" class="modal hidden">
@@ -172,95 +246,119 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Show welcome alert on page load
-      alert("Pick up one date for your event and Book it!!");
-  
-      const calendarEl = document.getElementById('calendar');
-      const modal = document.getElementById('bookingModal');
-      const closeModal = document.getElementById('closeModal');
-      const form = document.getElementById('bookingForm');
-  
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        selectable: true,
-        dateClick: function(info) {
-          const selectedDate = new Date(info.dateStr);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Strip time to compare only date
-  
-          if (selectedDate < today) {
-            alert("You cannot book events on past dates.");
-            return;
-          }
-  
-          // Store selected date
-          modal.dataset.date = info.dateStr;
-          modal.classList.remove('hidden');
-        },
-        events: [
-          // You can pre-populate events here if needed
-        ]
-      });
-  
-      calendar.render();
-  
-      // Close modal
-      closeModal.addEventListener('click', () => {
-        modal.classList.add('hidden');
-        form.reset();
-      });
-  
-      // Handle form submission
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-  
-        const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const contact = document.getElementById('contact').value.trim();
-        const eventType = document.getElementById('eventType').value;
-        const attendees = document.getElementById('attendees').value;
-        const date = modal.dataset.date;
-  
-        // Add event to calendar
-        calendar.addEvent({
-          title: `${eventType} by ${name}`,
-          start: date,
-          allDay: true,
-          extendedProps: {
-            name,
-            email,
-            contact,
-            eventType,
-            attendees
-          }
-        });
-  
-        alert("Event booked successfully!"); // ✅ Success alert
-  
-        modal.classList.add('hidden');
-        form.reset();
-      });
-  
-      // Tooltip with tippy.js
-      calendar.setOption('eventDidMount', function(info) {
-        const props = info.event.extendedProps;
-        const tooltipContent = `
-          <strong>${info.event.title}</strong><br>
-          Name: ${props.name}<br>
-          Email: ${props.email}<br>
-          Contact: ${props.contact}<br>
-          Attendees: ${props.attendees}
-        `;
-  
-        tippy(info.el, {
-          content: tooltipContent,
-          allowHTML: true,
-          theme: 'light-border',
-          placement: 'top'
-        });
-      });
+  alert("Pick up one date for your event and Book it!!");
+
+  const calendarEl = document.getElementById('calendar');
+  const modal = document.getElementById('bookingModal');
+  const closeModal = document.getElementById('closeModal');
+  const form = document.getElementById('bookingForm');
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    selectable: true,
+    dateClick: function(info) {
+      const selectedDate = new Date(info.dateStr);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Strip time to compare only date
+
+      if (selectedDate < today) {
+        alert("You cannot book events on past dates.");
+        return;
+      }
+
+      // Store selected date
+      modal.dataset.date = info.dateStr;
+      modal.classList.remove('hidden');
+    },
+    events: [
+      // Dynamically added events will appear here
+    ],
+    eventColor: '#f87171', // red for booked
+    eventBackgroundColor: '#f87171',
+    eventBorderColor: '#ef4444',
+    // Highlight available future dates in light green
+    backgroundEvents: [
+      {
+        start: new Date().toISOString().split('T')[0],
+        end: '2999-12-31',
+        display: 'background',
+        color: '#d1fae5' // light green
+      }
+    ]
+  });
+
+  calendar.render();
+
+  // Close modal
+  closeModal.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    form.reset();
+  });
+
+  // Handle form submission
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const contact = document.getElementById('contact').value.trim();
+    const eventType = document.getElementById('eventType').value;
+    const attendees = document.getElementById('attendees').value;
+    const date = modal.dataset.date;
+
+    // Add event to calendar
+    const newEvent = {
+      title: `${eventType} by ${name}`,
+      start: date,
+      allDay: true,
+      backgroundColor: '#f87171', // red
+      borderColor: '#ef4444',
+      textColor: '#000',
+      extendedProps: {
+        name,
+        email,
+        contact,
+        eventType,
+        attendees
+      }
+    };
+
+    // Save event to localStorage
+    let events = JSON.parse(localStorage.getItem('events')) || [];
+    events.push(newEvent);
+    localStorage.setItem('events', JSON.stringify(events));
+
+    // Add event to the calendar display
+    calendar.addEvent(newEvent);
+
+    alert("Event booked successfully!");
+
+    modal.classList.add('hidden');
+    form.reset();
+  });
+
+  // Tooltip with tippy.js
+  calendar.setOption('eventDidMount', function(info) {
+    const props = info.event.extendedProps;
+    const tooltipContent = `
+      <strong>${info.event.title}</strong><br>
+      Name: ${props.name}<br>
+      Email: ${props.email}<br>
+      Contact: ${props.contact}<br>
+      Attendees: ${props.attendees}
+    `;
+
+    tippy(info.el, {
+      content: tooltipContent,
+      allowHTML: true,
+      theme: 'light-border',
+      placement: 'top'
     });
+  });
+});
+
   </script>
+  
   
 </body>
 </html>

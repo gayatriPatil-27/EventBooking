@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Event Listings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #111827;
+    }
+
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: #1f2937;
+    }
+
+    .card p {
+      margin: 4px 0;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .no-events {
+      text-align: center;
+      font-size: 18px;
+      color: #6b7280;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 30px auto 0;
+      text-align: center;
+      background-color: #3b82f6;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-btn:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upcoming Event Listings</h1>
+
+  <div class="card-container" id="eventList"></div>
+
+  <p class="no-events" id="noEvents">No events have been booked yet.</p>
+
+  <a href="bookEvent.html" class="back-btn">← Back to Calendar</a>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const eventList = document.getElementById('eventList');
+      const noEvents = document.getElementById('noEvents');
+      const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
+
+      if (storedEvents.length === 0) {
+        noEvents.style.display = 'block';
+        return;
+      }
+
+      noEvents.style.display = 'none';
+
+      storedEvents.forEach(event => {
+        const props = event.extendedProps;
+        const card = document.createElement('div');
+        card.classList.add('card');
+
+        card.innerHTML = `
+          <h3>${event.title}</h3>
+          <p><strong>Date:</strong> ${event.start}</p>
+          <p><strong>Name:</strong> ${props.name}</p>
+          <p><strong>Email:</strong> ${props.email}</p>
+          <p><strong>Contact:</strong> ${props.contact}</p>
+          <p><strong>Attendees:</strong> ${props.attendees}</p>
+          <p><strong>Event Type:</strong> ${props.eventType}</p>
+        `;
+
+        eventList.appendChild(card);
+      });
+    });
+  </script>
+</body>
+</html>
